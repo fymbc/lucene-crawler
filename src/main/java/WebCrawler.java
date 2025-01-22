@@ -38,10 +38,13 @@ public class WebCrawler {
             System.out.println("Crawling: " + current);
 
             try {
-                String pageContent = fetchContent(current);
-                if (pageContent != null) {
-                    this.indexer.indexPage(current, pageContent);
-                    processLinks(current, pageContent);
+                String pageHTML = fetchContent(current);
+                if (pageHTML != null) {
+                    Document doc = Jsoup.parse(pageHTML);
+                    String title = doc.title();
+                    String body = doc.body().text();
+                    this.indexer.indexPage(current, title, body);
+                    processLinks(current, pageHTML);
                 }
             } catch (IOException | ParseException e) {
                 System.err.println("Failed to fetch/process URL: " + current);
