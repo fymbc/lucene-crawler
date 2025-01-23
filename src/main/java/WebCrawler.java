@@ -4,6 +4,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
+import org.apache.lucene.store.MMapDirectory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,14 +16,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class WebCrawler {
-    private int maxLinks = 0;
+    private final int maxLinks;
     private final Indexer indexer;
     private final HashSet<String> visited = new HashSet<>();
     private final Queue<String> urlQueue = new LinkedList<>();
+    private final Reporter reporter;
+    private final MMapDirectory directory;
 
-    public WebCrawler(Indexer indexer, int maxLinks) {
+    public WebCrawler(Indexer indexer, int maxLinks, Reporter reporter, MMapDirectory directory) {
         this.maxLinks = maxLinks;
         this.indexer = indexer;
+        this.reporter = reporter;
+        this.directory = directory;
     }
 
     public void crawl(String seedUrl) {
@@ -44,6 +49,9 @@ public class WebCrawler {
                     String title = doc.title();
                     String body = doc.body().text();
                     this.indexer.indexPage(current, title, body);
+
+                    this.reporter.update(this.directory);
+
                     processLinks(current, pageHTML);
                 }
             } catch (IOException | ParseException e) {
