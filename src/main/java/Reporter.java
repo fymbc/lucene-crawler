@@ -55,37 +55,22 @@ public class Reporter {
         this.docsIndexed++;
     }
 
-    public int getLinksCrawled() {
-        return this.linksCrawled;
-    }
+    public void logStatistics(Queue<String> urlQueue) {
+        long elapsedTime = Duration.between(startTime, Instant.now()).toSeconds();
+        double elapsedMinutes = elapsedTime / 60.0;
 
-    public int getKeywordsExtracted() {
-        return this.keywordsExtracted;
-    }
+        double crawlSpeedPagesPerMinute = elapsedMinutes > 0 ? linksCrawled / elapsedMinutes : 0;
+        double crawlSpeedKeywordsPerMinute = elapsedMinutes > 0 ? keywordsExtracted / elapsedMinutes : 0;
+        double urlCrawledRatio = linksCrawled / (double) (linksCrawled + urlQueue.size());
 
-    public int getDocsIndexed() {
-        return this.docsIndexed;
-    }
-
-    public double crawlSpeedPerMinute() {
-        long elapsedSeconds = Duration.between(this.startTime, Instant.now()).getSeconds();
-        if (elapsedSeconds == 0) {
-            return 0;
-        }
-        double minutes = elapsedSeconds / 60.0;
-        return this.linksCrawled / minutes;
-    }
-
-    public double linksQueueRatio(Queue<String> queue) {
-        return (double) this.linksCrawled / (this.linksCrawled + queue.size());
-    }
-
-    public long getElapsedTime() {
-        return Duration.between(this.startTime, Instant.now()).getSeconds();
-    }
-
-    public HashSet<String> getKeywords() {
-        return new HashSet<>(this.keywords); // Return a copy to preserve encapsulation
+        System.out.printf("Crawl Statistics:\n");
+        System.out.printf("Total time elapsed: %d seconds\n", elapsedTime);
+        System.out.printf("- Pages Crawled per Minute: %.2f\n", crawlSpeedPagesPerMinute);
+        System.out.printf("- Keywords Extracted per Minute: %.2f\n", crawlSpeedKeywordsPerMinute);
+        System.out.printf("- URLs Crawled/Queued Ratio: %.2f\n", urlCrawledRatio);
+        System.out.printf("- Total Links Crawled: %d\n", linksCrawled);
+        System.out.printf("- Total Keywords Extracted: %d\n", keywordsExtracted);
+        System.out.printf("- Total Pages Indexed: %d\n", docsIndexed);
     }
 
     public void update(MMapDirectory directory) {

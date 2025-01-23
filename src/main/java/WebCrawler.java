@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 public class WebCrawler {
     private final int maxLinks;
@@ -22,12 +23,14 @@ public class WebCrawler {
     private final Queue<String> urlQueue = new LinkedList<>();
     private final Reporter reporter;
     private final MMapDirectory directory;
+    private final Logger logger;
 
-    public WebCrawler(Indexer indexer, int maxLinks, Reporter reporter, MMapDirectory directory) {
+    public WebCrawler(Indexer indexer, int maxLinks, Reporter reporter, MMapDirectory directory, Logger logger) {
         this.maxLinks = maxLinks;
         this.indexer = indexer;
         this.reporter = reporter;
         this.directory = directory;
+        this.logger = logger;
     }
 
     public void crawl(String seedUrl) {
@@ -35,12 +38,13 @@ public class WebCrawler {
 
         while (!this.urlQueue.isEmpty() && this.visited.size() < this.maxLinks) {
             String current = this.urlQueue.poll();
+            logger.info("Crawling: " + current);
             if (this.visited.contains(current)) {
+                logger.info("Skipped: " + current);
                 continue; // skip visited URL
             }
 
             this.visited.add(current);
-            System.out.println("Crawling: " + current);
 
             try {
                 String pageHTML = fetchContent(current);
@@ -53,11 +57,13 @@ public class WebCrawler {
                     this.reporter.update(this.directory);
 
                     processLinks(current, pageHTML);
+                    logger.info("Indexed: " + current);
                 }
             } catch (IOException | ParseException e) {
-                System.err.println("Failed to fetch/process URL: " + current);
+                logger.warning("Failed to fetch/process URL: " + current);
             }
         }
+        reporter.logStatistics(this.urlQueue);
     }
 
     public String fetchContent(String url) throws IOException, ParseException {

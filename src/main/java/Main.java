@@ -1,15 +1,19 @@
 import org.apache.lucene.store.MMapDirectory;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Main {
+    private static final Logger crawlLogger = Logger.getLogger("crawlLogger");
+
     public static void main(String[] args) {
         String seedUrl = "https://example.com";
-        int maxLinks = 50;
+        int maxLinks = 20;
         String dirPath = "./index";
 
         try {
@@ -21,18 +25,22 @@ public class Main {
                     throw new IOException("Failed to create index directory at: " + dirPath);
                 }
             }
+            new File("/logs").mkdirs();
+
+            FileHandler fileHandler = new FileHandler("logs/crawling.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            crawlLogger.addHandler(fileHandler);
 
             MMapDirectory indexDirectory = new MMapDirectory(Paths.get(dirPath));
             Indexer indexer = new Indexer(indexDirectory);
             Reporter reporter = new Reporter();
-            WebCrawler crawler = new WebCrawler(indexer, maxLinks, reporter, indexDirectory);
+            WebCrawler crawler = new WebCrawler(indexer, maxLinks, reporter, indexDirectory, crawlLogger);
             crawler.crawl(seedUrl);
+            indexer.close(); // close index before search
 
-            indexer.close();
-
-            Searcher searcher = new Searcher(indexDirectory);
-            searcher.search("example");
-            searcher.close();
+//            Searcher searcher = new Searcher(indexDirectory);
+//            searcher.search("example");
+//            searcher.close();
 
         } catch (IOException e) {
             System.out.println("Error crawling.");

@@ -27,7 +27,6 @@ public class Indexer implements AutoCloseable {
         doc.add(new TextField("title", title != null ? title : "No Title", Field.Store.YES));
         doc.add(new TextField("content", content, Field.Store.YES)); // content
         indexWriter.addDocument(doc);
-        System.out.println("Indexed: " + url);
     }
 
     public void close() throws IOException {
