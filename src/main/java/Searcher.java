@@ -41,7 +41,7 @@ public class Searcher implements AutoCloseable {
                 Document document = this.searcher.doc(scoreDoc.doc);
                 System.out.println("URL: " + document.get("url"));
                 System.out.println("Title: " + document.get("title"));
-                System.out.println(document.get("content").substring(0,15));
+                System.out.println(document.get("content").substring(0,60) + "...");
                 System.out.println("Score: " + scoreDoc.score);
                 System.out.println("--");
             }
