@@ -38,9 +38,10 @@ public class WebCrawler {
 
         while (!this.urlQueue.isEmpty() && this.visited.size() < this.maxLinks) {
             String current = this.urlQueue.poll();
-            logger.info("Crawling: " + current);
+            this.logger.info("Crawling: " + current);
             if (this.visited.contains(current)) {
-                logger.info("Skipped: " + current);
+                this.logger.info("Skipped: " + current);
+                this.reporter.incrementPagesSkipped();
                 continue; // skip visited URL
             }
 
@@ -57,13 +58,13 @@ public class WebCrawler {
                     this.reporter.update(this.directory);
 
                     processLinks(current, pageHTML);
-                    logger.info("Indexed: " + current);
+                    this.logger.info("Indexed: " + current);
                 }
             } catch (IOException | ParseException e) {
-                logger.warning("Failed to fetch/process URL: " + current);
+                this.logger.warning("Failed to fetch/process URL: " + current);
             }
         }
-        reporter.logStatistics(this.urlQueue);
+        this.reporter.logFinalStatistics();
     }
 
     public String fetchContent(String url) throws IOException, ParseException {
@@ -88,6 +89,10 @@ public class WebCrawler {
                 this.urlQueue.add(absUrl);
             }
         }
+    }
+
+    public Queue<String> getUrlQueue() {
+        return this.urlQueue;
     }
 
 }

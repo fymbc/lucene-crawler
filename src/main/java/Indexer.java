@@ -26,10 +26,11 @@ public class Indexer implements AutoCloseable {
         doc.add(new TextField("url", url, Field.Store.YES)); // url
         doc.add(new TextField("title", title != null ? title : "No Title", Field.Store.YES));
         doc.add(new TextField("content", content, Field.Store.YES)); // content
-        indexWriter.addDocument(doc);
+        this.indexWriter.addDocument(doc);
+        this.indexWriter.commit();
     }
 
     public void close() throws IOException {
-        indexWriter.close();
+        this.indexWriter.close();
     }
 }
