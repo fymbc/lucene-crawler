@@ -4,7 +4,13 @@ This is a toy web crawler that integrates with Apache Lucene for indexing, searc
 Designed as part of a project for GATech's CS4675.
 
 ## Usage
-All user-adjustable parameters reside within ``Main.java``.
-* `seedUrl`: Base/seed URL to start crawl from. Default URL is `https:/www.example.com`
-* `maxLinks`: Number of pages to crawl. Default value is `10`
-* `dirPath`: Location of indexed pages. Default location is `./index` (i.e. Upon startup, a directory will be created titled `index`)
+Download the executable JAR file under releases into an empty folder.
+
+Ensure you have Java JDK 17 installed.
+
+Syntax: `java -jar NAME_OF_FILE.jar <seedUrl> <maxLinks> <queryString>`
+
+Replace NAME_OF_FILE with the name you saved the JAR file as.
+* `seedUrl`: Base/seed URL to start crawl from. Ensure it is a fully qualified URL, including `https://`
+* `maxLinks`: Number of pages to crawl. Recommended value between 500-2000.
+* `queryString`: Search query to process after crawling is complete.

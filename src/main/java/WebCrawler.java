@@ -1,3 +1,4 @@
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class WebCrawler {
@@ -68,6 +70,11 @@ public class WebCrawler {
     }
 
     public String fetchContent(String url) throws IOException, ParseException {
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(15, TimeUnit.SECONDS)
+                .setSocketTimeout(15, TimeUnit.SECONDS)
+                .build();
+
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
 
